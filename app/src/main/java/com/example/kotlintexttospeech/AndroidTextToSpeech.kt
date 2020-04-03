@@ -27,12 +27,12 @@ class AndroidTextToSpeech(editText: TextView, seekBarPitch: SeekBar, seekBarSpee
     var seekBarSpeed : SeekBar = seekBarSpeed
     var tts : TextToSpeech = tts
     var text = editText.text.toString()
-    var passedText : String = ""
+    var readtext : String = text
 
     private var sentenceList : List<String> = ArrayList()
     var counter = 0
     private var speechListener = object : UtteranceProgressListener(){
-        var end : Int = 0
+        var point : Int = 0
         override fun onDone(utteranceId: String?) {
             Log.i("XXX", "utterance done");
         }
@@ -59,11 +59,10 @@ class AndroidTextToSpeech(editText: TextView, seekBarPitch: SeekBar, seekBarSpee
                     BackgroundColorSpan(Color.YELLOW),
                     counter + start,
                     counter + end,
-                    Spanned.SPAN_COMPOSING
-                    //Spanned.SPAN_INCLUSIVE_INCLUSIVE
+                    Spanned.SPAN_INCLUSIVE_INCLUSIVE
                 )
-                this.end = end
-                editText?.text =  passedText + textWithHighlights
+                point = counter + start
+                editText?.text = textWithHighlights
             })
         }
     }
@@ -74,8 +73,7 @@ class AndroidTextToSpeech(editText: TextView, seekBarPitch: SeekBar, seekBarSpee
     fun start() {
 
         sentenceList = text.split(".")
-        passedText = text.subSequence(passedText.length, counter).toString()
-        text = text.substring(counter)
+        readtext = text.substring(counter)
         tts?.setOnUtteranceProgressListener(speechListener)
 
         var pitch = (seekBarPitch.progress.div(50).toFloat());
@@ -96,17 +94,15 @@ class AndroidTextToSpeech(editText: TextView, seekBarPitch: SeekBar, seekBarSpee
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private fun speak(){
-        if(editText.text.length <= counter){
+        if(editText.text.length <= counter-10){
             counter = 0;
-            text = editText.text.toString()
+            readtext = editText.text.toString()
         }
-        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "")
-
-
+        tts.speak(readtext, TextToSpeech.QUEUE_FLUSH, null, "")
     }
 
     fun pause(){
         tts.stop()
-        counter = speechListener.end
+        counter = speechListener.point
     }
 }

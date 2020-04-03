@@ -56,9 +56,13 @@ class MainActivity : AppCompatActivity(),
 
         pause?.setOnClickListener(){
             aTTS.pause()
+            button?.isEnabled = true
+            pause?.isEnabled = false
         }
         button?.setOnClickListener(View.OnClickListener  {
             aTTS.start()
+            button?.isEnabled = false
+            pause?.isEnabled = true
         })
     }
 
