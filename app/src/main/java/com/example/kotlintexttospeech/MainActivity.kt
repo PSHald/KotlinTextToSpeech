@@ -22,13 +22,13 @@ import androidx.fragment.app.FragmentActivity
 import com.example.androidtexttospeechtest.R
 import java.util.*
 
-class MainActivity : FragmentActivity(),
+class MainActivity : AppCompatActivity(),
     TextToSpeech.OnInitListener {
     private var tts: TextToSpeech? = null
-    private var editText: EditText? = null
     private var seekBarPitch: SeekBar? = null
     private var seekBarSpeed: SeekBar? = null
     private var button: Button? = null
+    private var pause: Button? = null
     private var textView : TextView? = null
     private var text : String = "Der var så dejligt ude på landet; det var sommer, kornet stod gult, havren grøn, " +
             "høet var rejst i stakke nede i de grønne enge, og der gik storken på sine lange, røde ben og snakkede ægyptisk, " +
@@ -44,53 +44,24 @@ class MainActivity : FragmentActivity(),
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         textView = findViewById(R.id.TextView)
-        textView?.setText(text)
-        editText = findViewById(R.id.edit_text)
+        textView?.text = text
         seekBarPitch = findViewById(R.id.seek_bar_pitch)
         seekBarSpeed = findViewById(R.id.seek_bar_speed)
         button = findViewById(R.id.button_speak)
+        pause = findViewById(R.id.button_pause)
         tts = TextToSpeech(this, this)
 
-        var speechListener = object : UtteranceProgressListener(){
-            override fun onDone(utteranceId: String?) {
-                Log.i("XXX", "utterance done");
-            }
 
-            override fun onError(utteranceId: String?) {
-                Log.i("XXX", "utterance error");
-            }
+        var aTTS = AndroidTextToSpeech(textView!!, seekBarPitch!!, seekBarSpeed!!, tts!!, this!!)
 
-            override fun onStart(utteranceId: String?) {
-                Log.i("XXX", "utterance started");
-            }
-            override fun onRangeStart(utteranceId: String?, start: Int, end: Int, frame: Int) {
-                Log.i(
-                    "XXX", "onRangeStart() ... utteranceId: " + utteranceId.toString() + ", start: " + start
-                        .toString() + ", end: " + end.toString() + ", frame: " + frame
-                )
-                // onRangeStart (and all UtteranceProgressListener callbacks) do not run on main thread
-                // ... so we explicitly manipulate views on the main thread:
-                runOnUiThread(Runnable {
-                    val textWithHighlights: Spannable = SpannableString(text)
-                    textWithHighlights.setSpan(
-                        BackgroundColorSpan(Color.YELLOW),
-                        start,
-                        end,
-                        Spanned.SPAN_INCLUSIVE_INCLUSIVE
-                    )
-                    textView?.text = textWithHighlights
-                })
-            }
+        pause?.setOnClickListener(){
+            aTTS.pause()
         }
-        tts?.setOnUtteranceProgressListener(speechListener)
-
-
         button?.setOnClickListener(View.OnClickListener  {
-                var aTTS = AndroidTextToSpeech()
-                    aTTS.speak(textView!!, seekBarPitch!!, seekBarSpeed!!, tts!!)
-                }
-        )
+            aTTS.start()
+        })
     }
+
 
     override fun onInit(status: Int) {
         if(status == TextToSpeech.SUCCESS) {
@@ -104,6 +75,7 @@ class MainActivity : FragmentActivity(),
             Log.e("TTS", "Initialisation failed")
         }
     }
+
     public override fun onDestroy() {
         if (tts != null) {
             tts!!.stop()
@@ -112,16 +84,13 @@ class MainActivity : FragmentActivity(),
         super.onDestroy()
     }
 
-    fun findLanguage() : Int?{
-        var Sprog : Int? = tts?.isLanguageAvailable(Locale("da", "DK"))
-        if(Sprog != TextToSpeech.LANG_MISSING_DATA){
+    private fun findLanguage() : Int?{
+        var language : Int? = tts?.isLanguageAvailable(Locale("da", "DK"))
+        if(language != TextToSpeech.LANG_MISSING_DATA){
             tts?.language = Locale("da", "DK")
         } else{
             tts?.language = Locale.ENGLISH
         }
-        return Sprog
+        return language
     }
-
-
-
 }
