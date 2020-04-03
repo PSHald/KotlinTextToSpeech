@@ -27,9 +27,7 @@ class AndroidTextToSpeech(editText: TextView, seekBarPitch: SeekBar, seekBarSpee
     var seekBarSpeed : SeekBar = seekBarSpeed
     var tts : TextToSpeech = tts
     var text = editText.text.toString()
-    var readtext : String = text
-
-    private var sentenceList : List<String> = ArrayList()
+    private var readtext : String = text
     var counter = 0
     private var speechListener = object : UtteranceProgressListener(){
         var point : Int = 0
@@ -71,8 +69,6 @@ class AndroidTextToSpeech(editText: TextView, seekBarPitch: SeekBar, seekBarSpee
     @TargetApi(Build.VERSION_CODES.O)
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     fun start() {
-
-        sentenceList = text.split(".")
         readtext = text.substring(counter)
         tts?.setOnUtteranceProgressListener(speechListener)
 
