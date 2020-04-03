@@ -2,7 +2,6 @@ package com.example.kotlintexttospeech
 
 import android.graphics.Color
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
@@ -10,7 +9,6 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.BackgroundColorSpan
-import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -25,7 +23,6 @@ import java.util.*
 class MainActivity : FragmentActivity(),
     TextToSpeech.OnInitListener {
     private var tts: TextToSpeech? = null
-    private var editText: EditText? = null
     private var seekBarPitch: SeekBar? = null
     private var seekBarSpeed: SeekBar? = null
     private var button: Button? = null
@@ -45,7 +42,6 @@ class MainActivity : FragmentActivity(),
         setContentView(R.layout.activity_main)
         textView = findViewById(R.id.TextView)
         textView?.setText(text)
-        editText = findViewById(R.id.edit_text)
         seekBarPitch = findViewById(R.id.seek_bar_pitch)
         seekBarSpeed = findViewById(R.id.seek_bar_speed)
         button = findViewById(R.id.button_speak)
@@ -112,14 +108,14 @@ class MainActivity : FragmentActivity(),
         super.onDestroy()
     }
 
-    fun findLanguage() : Int?{
-        var Sprog : Int? = tts?.isLanguageAvailable(Locale("da", "DK"))
-        if(Sprog != TextToSpeech.LANG_MISSING_DATA){
+    private fun findLanguage() : Int?{
+        var language : Int? = tts?.isLanguageAvailable(Locale("da", "DK"))
+        if(language != TextToSpeech.LANG_MISSING_DATA){
             tts?.language = Locale("da", "DK")
         } else{
             tts?.language = Locale.ENGLISH
         }
-        return Sprog
+        return language
     }
 
 
